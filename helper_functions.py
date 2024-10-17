@@ -41,25 +41,25 @@ def create_bigram_barplot(dataframe, text_column, sentiment_column, sentiment_cl
     color (str): Color of the barchart
     
     Returns:
-    None
+    figure
     """
 
-    # Filter the DataFrame for the specified sentiment class
+    # filter the DataFrame for the specified sentiment class
     df_filtered = dataframe.loc[dataframe[sentiment_column] == sentiment_class].copy()
 
-    # Tokenization
+    # tokenization
     df_filtered['tokens'] = df_filtered[text_column].apply(lambda x: x.split())
 
-    # Create Bigrams
+    # create Bigrams
     df_filtered['bigrams'] = df_filtered['tokens'].apply(lambda x: [x[i] + " " + x[i+1] for i in range(len(x)-1)])
 
-    # Counting bigram frequency
+    # counting bigram frequency
     bigram_freq = Counter([item for sublist in df_filtered['bigrams'] for item in sublist])
 
-    # Creating DataFrame for top 15 bigrams
+    # creating DataFrame for top 15 bigrams
     bigrams_freq_df = pd.DataFrame(bigram_freq.most_common(15), columns=['Bigram', 'Frequency'])
 
-    # Creating bar plot
+    # creating bar plot
     fig = px.bar(
         bigrams_freq_df, y=bigrams_freq_df['Bigram'], x=bigrams_freq_df['Frequency'],
         color_discrete_sequence=[color]
@@ -81,25 +81,25 @@ def create_trigram_barplot(dataframe, text_column, sentiment_column, sentiment_c
     color (str): The color of the bars in the barchart.
 
     Returns:
-    None
+    figure
   """
 
-  # Filter the DataFrame for the specified sentiment class
+  # filter the DataFrame for the specified sentiment class
   df = dataframe[dataframe[sentiment_column] == sentiment_class].copy()
 
-  # Tokenization
+  # tokenization
   df['tokens'] = df[text_column].apply(lambda x: x.split())
 
-  # Trigram (change)
+  # trigram (change)
   df['trigrams'] = df['tokens'].apply(lambda x: [x[i] + " " + x[i+1] + " " + x[i+2] for i in range(len(x)-2)])
 
-  # Counting trigram frequency
+  # counting trigram frequency
   trigram_freq = Counter([item for sublist in df['trigrams'] for item in sublist])
 
-  # Creating DataFrame for top bigrams
+  # creating DataFrame for top bigrams
   trigrams_freq_df = pd.DataFrame(trigram_freq.most_common(15), columns=['Trigram', 'Frequency'])
 
-  # Creating bar plot
+  # creating bar plot
   fig = px.bar(
         trigrams_freq_df, y=trigrams_freq_df['Trigram'], x=trigrams_freq_df['Frequency'],
         color_discrete_sequence=[color]
@@ -119,24 +119,23 @@ def create_wordcloud(dataframe, text_column, sentiment_column, sentiment_class):
     sentiment_class (str): The sentiment class to filter the DataFrame (positif, netral, or negatif).
 
     Returns:
-    None
+    figure
     """
-    # Filter the DataFrame for the specified sentiment class
+    # filter the DataFrame for the specified sentiment class
     df = dataframe[dataframe[sentiment_column] == sentiment_class]
 
-    # Choose dataset column
+    # choose dataset column
     text_data = df[text_column]
 
-    # Generate word cloud
+    # generate word cloud
     all_text = ' '.join(text_data.tolist())
     word_cloud = WordCloud(max_words=100, background_color='white',
                            random_state=100, colormap='seismic').generate(all_text)
-    fig = plt.figure(figsize=(16, 8))
+    fig = plt.figure(figsize=(32, 16))
     ax = fig.add_subplot(1, 1, 1)
     plt.imshow(word_cloud, interpolation='bilinear')
-    #plt.title(f'WordCloud of Frequently Used Words in {sentiment_class}', fontsize=20)
+    plt.title(f'WordCloud of Frequently Used Words in {sentiment_class}', fontsize=20)
     plt.axis("off")
-    #plt.show()
 
     return fig
 

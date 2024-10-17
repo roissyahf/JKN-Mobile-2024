@@ -9,7 +9,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # add title
 st.set_page_config(page_title="Unveiling hidden insights from user reviews",
-                   page_icon=":phone:", layout="wide")
+                   page_icon=":iphone:", layout="wide")
 st.title('JKN Mobile User Reviews Dashboard')
 st.write('Understanding user experiences of JKN Mobile App: Sentiment Analysis and Topic Modeling Approach')
 
@@ -31,7 +31,7 @@ with st.sidebar:
     st.markdown(
         """
         This dashboard seeks to display the underlying sentiments and concerns expressed by JKN Mobile users,
-        under the period of January 01, 2024, until October 01, 2024.
+        **under the period of January 01, 2024, until October 01, 2024.**
         """
     )
 
@@ -50,9 +50,9 @@ with st.sidebar:
     st.markdown(
         """
         **Legend:**
-        - Green: Positive sentiment
-        - Grey: Neutral sentiment
-        - Red: Negative sentiment
+        - Green: $${\color{green}Positive \space sentiment}$$
+        - Grey: $${\color{grey}Neutral \space sentiment}$$
+        - Red: $${\color{red}Negative \space sentiment}$$
         """
     )
 
@@ -63,17 +63,18 @@ col3, col4 = st.columns(2)
 
 with col3:
     # sentiment proportion
-    st.subheader('Sentiment Distribution')
+    st.subheader('37.4% of users have a negative sentiment towards the app')
     sentiment_plot = hf.plot_sentiment(df)
-    sentiment_plot.update_layout(height=350, title_x=0.5)
+    sentiment_plot.update_layout(height=350, title_x=0.5, title='Sentiment Distribution')
     st.plotly_chart(sentiment_plot, theme=None, use_container_width=True)
 
 with col4:
     # rating distribution
-    st.subheader('Rating Distribution')
+    st.subheader('13,414 reviews gave a rating of 1, what happened?')
     ratings = df['score'].value_counts().reset_index()
     ratings.columns = ['score', 'count']
     fig = px.bar(ratings, y='count', x='score')
+    fig.update_layout(title='Rating Count')
     st.plotly_chart(fig, theme='streamlit', use_container_width=True)
 
 # stacked bar-chart: number of reviews by month-year, for each sentiment 
@@ -94,8 +95,9 @@ fig = px.bar(df_plotly, x='month_name', y='count', color='sentiment',
              color_discrete_map=color_map,
              )
 
-fig.update_layout(xaxis_title='Month', yaxis_title='Number of Reviews', showlegend=False)
-st.subheader("Monthly Review Counts by Sentiment")
+fig.update_layout(xaxis_title='Month', yaxis_title='Number of Reviews', showlegend=False,
+                  title='Monthly Review Counts by Sentiment')
+st.subheader("The number of reviews across all three sentiments, has seen ups and downs over the past 9 months ")
 st.plotly_chart(fig, theme='streamlit', use_container_width=True)
 
 # add options, to choose sentiment
@@ -113,23 +115,25 @@ color_map = {
 # get the appropriate color based on the selected sentiment
 selected_color = color_map.get(sentiment_selection, "blue")  # Default to blue if not found
 
+st.subheader("What are users actually experiencing?")
+
 # add more 3 charts
 col6, col7, col8 = st.columns(3)
 
 with col6:
-    st.subheader(f'Bigrams of {sentiment_selection} sentiment')
     fig = hf.create_bigram_barplot(df, 'Text', 'sentiment', f'{sentiment_selection}', selected_color)
+    fig.update_layout(title=f'Bigrams of {sentiment_selection} sentiment')
     st.plotly_chart(fig, theme='streamlit', use_container_width=True)
 
 with col7:
-    st.subheader(f'Trigrams of {sentiment_selection} sentiment')
     fig = hf.create_trigram_barplot(df, 'Text', 'sentiment', f'{sentiment_selection}', selected_color)
+    fig.update_layout(title=f'Trigrams of {sentiment_selection} sentiment')
     st.plotly_chart(fig, theme='streamlit', use_container_width=True)
 
 with col8:
     # wordcloud
-    st.subheader(f'Word cloud of {sentiment_selection} sentiment')
     fig = hf.create_wordcloud(df, 'Text', 'sentiment', f'{sentiment_selection}')
+    #fig.update_layout(title=f'Word cloud of {sentiment_selection} sentiment')
     st.pyplot(fig)
 
 # add more 2 charts
@@ -148,7 +152,7 @@ with col9:
     y=topic_sentiment_counts.index.tolist(),
     orientation='h',
     barmode='stack',
-    #title='Topic Distribution by Sentiment',
+    title='Topic Distribution by Sentiment',
     labels={'value': 'Count', 'Topic-Interpretation': 'Topic Interpretation', 'variable': 'Sentiment'},
     color_discrete_map={'positive': 'green', 'neutral': 'grey', 'negative': 'red'}
     )
@@ -161,13 +165,13 @@ with col9:
         showlegend=False
     )
 
-    st.subheader('Topic Distribution by Sentiment')
+    st.subheader('What topics can be found from their reviews?')
     st.plotly_chart(fig, theme='streamlit', use_container_width=True)
 
 with col10:
     # table of original reviews, its score, its sentiment, sentiment-score
     df_display = df.sample(frac=0.001).reset_index()
-    st.subheader('Reviews Table (sample)')
+    st.subheader('This is what a sample review looks like')
     st.dataframe(df_display[['content', 'score', 'sentiment', 'sentiment-score']].style.applymap(
         hf.sentiment_color, subset='sentiment'
     ))
