@@ -159,6 +159,7 @@ with col9:
 
     fig.update_layout(
         yaxis={'categoryorder':'total ascending'},
+        yaxis_title="Topics interpreted",
         legend_title='Sentiment',
         width=1000,
         height=800,
